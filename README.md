@@ -1,28 +1,26 @@
-# Self-Hosted Media Requests
+# Media Nexus: Media Wishlist
 
-A small self-hosted web application for collecting and managing movie and TV requests. It includes a static browser interface, a Flask API, CSV/JSON persistence, and optional local IMDb title validation.
+A self-hosted movie and TV request manager with a browser interface, Flask API, CSV/JSON storage, and optional local IMDb validation.
 
-## Quick start
+## Run
 
 ```bash
 cp .env.example .env
 docker compose up -d
 ```
 
-Open `http://localhost:8080`, or the port configured with `HOST_PORT`.
+Open `http://localhost:8080` or the port set by `HOST_PORT`.
 
-The repository intentionally contains no request history or IMDb database. The application creates request data under `data/` as it is used.
+No request history or IMDb database is included. The application creates request data under `data/`.
 
-## Build the optional IMDb database
-
-The application can run without the database, but IMDb lookups will report that the local database is not ready. Build a fresh database from IMDb's public datasets with:
+## Optional IMDb database
 
 ```bash
 docker compose --profile maintenance run --rm imdb-update
 ```
 
-The generated database and update timestamp are stored under `imdb/` and excluded from Git.
+Without it, local IMDb validation reports that the database is not ready. Generated database files and timestamps are stored under `imdb/`.
 
 ## Privacy
 
-Do not commit files generated under `data/` or `imdb/`. Request history can contain names, viewing preferences, request identifiers, and timestamps.
+`data/` and `imdb/` are excluded from Git. Do not commit them; request history may contain names, preferences, identifiers, and timestamps.
