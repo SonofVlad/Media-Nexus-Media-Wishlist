@@ -1,0 +1,49 @@
+services:
+  backend:
+    image: python:3.12-slim
+    restart: unless-stopped
+    working_dir: /app
+    command: >
+      sh -c "pip install --no-cache-dir -r requirements.txt &&
+             gunicorn --bind 0.0.0.0:50012 --workers 2 --timeout 60 app:app"
+    environment:
+      TZ: ${TZ:-UTC}
+      DATA_DIR: /data
+      IMDB_DIR: /imdb
+    volumes:
+      - ./backend:/app:ro
+      - ./data:/data
+      - ./imdb:/imdb
+    networks:
+      - requests-network
+
+  web:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "${HOST_PORT:-8080}:80"
+    environment:
+      TZ: ${TZ:-UTC}
+    volumes:
+      - ./:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+    networks:
+      - requests-network
+
+  imdb-update:
+    image: python:3.12-slim
+    profiles: ["maintenance"]
+    working_dir: /app
+    command: python update_imdb.py
+    environment:
+      TZ: ${TZ:-UTC}
+      IMDB_DIR: /imdb
+    volumes:
+      - ./backend:/app:ro
+      - ./imdb:/imdb
+
+networks:
+  requests-network:
+

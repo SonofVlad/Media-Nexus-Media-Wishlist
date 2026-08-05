@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Media Requests</title>
+  <link rel="icon" type="image/svg+xml" href="media-requests-icon.svg?v=3">
+  <link rel="stylesheet" href="requests.css?v=3">
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-title">
+      <img class="hero-icon" src="media-requests-icon.svg?v=3" alt="">
+      <h1>Media Requests</h1>
+    </div>
+    <div class="hero-actions">
+      <button id="add-request" type="button">Add Request</button>
+    </div>
+  </header>
+
+  <main>
+    <p id="message" hidden></p>
+
+    <section>
+      <div class="card-heading">
+        <h2>Active Requests</h2>
+        <div class="card-actions">
+          <button class="secondary-action edit-requester" data-scope="active" type="button" disabled>
+            Edit Requester
+          </button>
+          <button class="danger-action delete-selected" data-scope="active" type="button" disabled>
+            Delete Selected
+          </button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="select-column utility-column">
+                <input type="checkbox" class="select-all" data-scope="active" aria-label="Select all active requests">
+              </th>
+              <th class="requester-column"><button class="sort-button" data-scope="active" data-sort="requester" type="button">Requester</button></th>
+              <th class="type-column"><button class="sort-button" data-scope="active" data-sort="mediaType" type="button">Type</button></th>
+              <th class="name-column"><button class="sort-button" data-scope="active" data-sort="contentName" type="button">Name</button></th>
+              <th class="year-column"><button class="sort-button" data-scope="active" data-sort="year" type="button">Year</button></th>
+              <th class="imdb-column"><button class="sort-button" data-scope="active" data-sort="imdbId" type="button">IMDb</button></th>
+              <th class="acquired-column"><button class="sort-button" data-scope="active" data-sort="acquired" type="button">Acquired</button></th>
+              <th class="processed-column"><button class="sort-button" data-scope="active" data-sort="processed" type="button">Processed</button></th>
+            </tr>
+          </thead>
+          <tbody id="active-list"></tbody>
+        </table>
+      </div>
+      <p id="active-empty">No active requests.</p>
+    </section>
+
+    <section>
+      <div class="card-heading">
+        <h2>Completed</h2>
+        <div class="card-actions">
+          <button class="secondary-action edit-requester" data-scope="completed" type="button" disabled>
+            Edit Requester
+          </button>
+          <button class="danger-action delete-selected" data-scope="completed" type="button" disabled>
+            Delete Selected
+          </button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="select-column utility-column">
+                <input type="checkbox" class="select-all" data-scope="completed" aria-label="Select all completed requests">
+              </th>
+              <th class="requester-column"><button class="sort-button" data-scope="completed" data-sort="requester" type="button">Requester</button></th>
+              <th class="type-column"><button class="sort-button" data-scope="completed" data-sort="mediaType" type="button">Type</button></th>
+              <th class="name-column"><button class="sort-button" data-scope="completed" data-sort="contentName" type="button">Name</button></th>
+              <th class="year-column"><button class="sort-button" data-scope="completed" data-sort="year" type="button">Year</button></th>
+              <th class="imdb-column"><button class="sort-button" data-scope="completed" data-sort="imdbId" type="button">IMDb</button></th>
+              <th class="acquired-column"><button class="sort-button" data-scope="completed" data-sort="acquired" type="button">Acquired</button></th>
+              <th class="processed-column"><button class="sort-button" data-scope="completed" data-sort="processed" type="button">Processed</button></th>
+            </tr>
+          </thead>
+          <tbody id="completed-list"></tbody>
+        </table>
+      </div>
+      <p id="completed-empty">No completed requests.</p>
+    </section>
+  </main>
+
+  <dialog id="request-dialog">
+    <form id="request-form">
+      <h2>Add Request</h2>
+
+      <label>
+        Requester
+        <input name="requester" placeholder="Requester name" required>
+      </label>
+
+      <label>
+        IMDb URL
+        <div class="lookup-row">
+          <input
+            id="imdb-url"
+            name="imdbUrl"
+            type="url"
+            placeholder="https://www.imdb.com/title/tt1981677/"
+            pattern="https?://(www\.)?imdb\.com/title/tt[0-9]{7,10}/?.*"
+            required
+          >
+          <button id="lookup-button" type="button">Look Up</button>
+        </div>
+      </label>
+
+      <div id="lookup-status" class="lookup-status" hidden></div>
+
+      <div id="metadata-preview" class="metadata-preview" hidden>
+        <div><span>Media Type</span><strong id="preview-type"></strong></div>
+        <div><span>Name</span><strong id="preview-name"></strong></div>
+        <div><span>Year</span><strong id="preview-year"></strong></div>
+      </div>
+
+      <div class="actions">
+        <button id="cancel" class="secondary-action" type="button">Cancel</button>
+        <button id="submit-request" type="submit" disabled>Submit Request</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="edit-requester-dialog">
+    <form id="edit-requester-form">
+      <h2>Edit Requester</h2>
+      <p id="edit-requester-summary"></p>
+
+      <label>
+        New Requester
+        <input id="new-requester" maxlength="100" required>
+      </label>
+
+      <div class="actions">
+        <button id="cancel-edit-requester" class="secondary-action" type="button">Cancel</button>
+        <button type="submit">Save Requester</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="delete-dialog">
+    <form id="delete-form">
+      <h2>Delete Selected Requests</h2>
+      <p>
+        Type the currently displayed requester name for each item.
+        This permanently deletes the selected records.
+      </p>
+
+      <div id="delete-confirmations"></div>
+
+      <div class="actions">
+        <button id="cancel-delete" class="secondary-action" type="button">Cancel</button>
+        <button class="danger-action" type="submit">Delete Permanently</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="requests.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Generated request history and IMDb data
+data/*
+!data/.gitkeep
+imdb/*
+!imdb/.gitkeep
+
